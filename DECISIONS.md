@@ -39,3 +39,15 @@ Ambiguities in the brief and how they were resolved.
   people also seen in training. The photo subset (different people, different camera) scores a little lower
   (93.4 %), which is a better guess of accuracy for a new user.
 - J and Z are motion letters; the datasets capture them as one frame (the end pose), and so does the app.
+
+## Word model
+- Keras LSTM (Masking -> LSTM 96 -> LSTM 64 -> Dense 64 -> softmax), 30 frames x 134 features. Each training clip
+  gives 61 samples: time-warp crops (80-100 % of the signing span, because a live window never lines up exactly)
+  plus one shared rotation / aspect / mirror / position change per sample and per-frame jitter.
+- **Signer-disjoint split.** WLASL has several clips of the same person signing the same word. A plain random split
+  put 5 of 30 test clips next to a training twin and gave 90 % test accuracy; splitting whole signers per word
+  (signer IDs from the official `WLASL_v0.3.json`) gives 76.7 % (top-3 96.7 %), the honest number for a new signer.
+  The official WLASL split is not used because it leaves some of our words with no test clip.
+- The shipped model is retrained on train + val clips (83.3 % on the same test clips).
+- The signing span is the stretch between the first and last frame with a hand; live, the app classifies a sliding
+  30-frame window instead (see the sentence builder).

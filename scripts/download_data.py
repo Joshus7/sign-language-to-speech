@@ -33,6 +33,7 @@ import sys
 import zipfile
 from pathlib import Path
 
+import requests
 import yaml
 from huggingface_hub import hf_hub_download, snapshot_download
 
@@ -43,6 +44,8 @@ HF_LETTER_LANDMARKS = "sid220/asl-now-fingerspelling"
 HF_LETTER_IMAGES = "EitanG98/asl_letters"
 HF_WLASL = "Voxel51/WLASL"
 KAGGLE_ALPHABET = "grassknoted/asl-alphabet"
+# Official WLASL metadata (signer IDs, official splits) from the authors' repository.
+WLASL_META_URL = "https://raw.githubusercontent.com/dxli94/WLASL/master/start_kit/WLASL_v0.3.json"
 
 
 def vocabulary() -> list[str]:
@@ -92,7 +95,22 @@ def download_wlasl(max_per_word: int | None) -> None:
     snapshot_download(HF_WLASL, repo_type="dataset", local_dir=out, allow_patterns=files, max_workers=8)
     index = {w: [f for f in fs if (out / f).exists()] for w, fs in chosen.items()}
     (out / "index.json").write_text(json.dumps(index, indent=1))
+    write_signers(out, index)
     print(f"   {sum(map(len, index.values()))} clips on disk, index written to wlasl/index.json\n")
+
+
+def write_signers(out: Path, index: dict[str, list[str]]) -> None:
+    """wlasl/signers.json: clip path -> WLASL signer ID, so training can keep signers out of the test set."""
+    meta = out / "WLASL_v0.3.json"
+    if not meta.exists():
+        r = requests.get(WLASL_META_URL, timeout=120)
+        r.raise_for_status()
+        meta.write_bytes(r.content)
+    by_id = {i["video_id"]: i["signer_id"] for e in json.loads(meta.read_text()) for i in e["instances"]}
+    signers = {f: by_id.get(Path(f).stem) for fs in index.values() for f in fs}
+    (out / "signers.json").write_text(json.dumps(signers, indent=0))
+    print(f"   signer IDs for {sum(v is not None for v in signers.values())}/{len(signers)} clips "
+          f"({len(set(signers.values()) - {None})} signers)")
 
 
 def kaggle_credentials_present() -> bool:
