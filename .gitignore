@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+
+# Build
+build/
+dist/
+*.spec.bak
+
+# Data, models, user content — never committed
+/data/
+/models/*
+!/models/trained/
+/recordings/
+*.mp4
+*.avi
+*.mov
+*.db
+*.npy
+*.npz
+*.sqlite
+*.sqlite3
+/exports/
+
+# Secrets
+.env
+.env.*
+kaggle.json
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+
+# PyInstaller
+*.spec

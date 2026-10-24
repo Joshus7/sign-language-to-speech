@@ -1,0 +1,24 @@
+# Word vocabulary for Word mode. `gloss` is the WLASL label, `text` is what is added
+# to the sentence. Edit this list and re-run download_data.py, extract_landmarks.py and
+# train_dynamic.py to use a custom vocabulary (or another sign language).
+words:
+  - {gloss: hello, text: hello}
+  - {gloss: thank you, text: thank you}
+  - {gloss: "yes", text: "yes"}
+  - {gloss: "no", text: "no"}
+  - {gloss: please, text: please}
+  - {gloss: sorry, text: sorry}
+  - {gloss: help, text: help}
+  - {gloss: water, text: water}
+  - {gloss: food, text: food}
+  - {gloss: name, text: name}
+  - {gloss: good, text: good}
+  - {gloss: bad, text: bad}
+  - {gloss: i, text: I}
+  - {gloss: you, text: you}
+  - {gloss: love, text: love}
+  - {gloss: home, text: home}
+  - {gloss: stop, text: stop}
+  - {gloss: more, text: more}
+  - {gloss: again, text: again}
+  - {gloss: friend, text: friend}
